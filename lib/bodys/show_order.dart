@@ -11,7 +11,7 @@ class _ShowOrderState extends State<ShowOrder> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
+      body: Text('Show Order'),
     );
   }
 }

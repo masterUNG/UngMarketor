@@ -1,7 +1,9 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:ungmarketer/utility/my_constant.dart';
+import 'package:ungmarketer/utility/my_dialog.dart';
 import 'package:ungmarketer/widgets/show_progress.dart';
 
 class CreateAccount extends StatefulWidget {
@@ -15,6 +17,9 @@ class _CreateAccountState extends State<CreateAccount> {
   double? lat, lng;
   Map<MarkerId, Marker> markers = {};
   final formKey = GlobalKey<FormState>();
+  TextEditingController nameController = TextEditingController();
+  TextEditingController userController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
 
   Row buildName(double size) {
     return Row(
@@ -24,6 +29,7 @@ class _CreateAccountState extends State<CreateAccount> {
           margin: EdgeInsets.only(top: 16),
           width: size * 0.5,
           child: TextFormField(
+            controller: nameController,
             validator: (value) {
               if (value!.isEmpty) {
                 return 'Please Fill Name in Blank';
@@ -59,6 +65,7 @@ class _CreateAccountState extends State<CreateAccount> {
           margin: EdgeInsets.only(top: 16),
           width: size * 0.5,
           child: TextFormField(
+            controller: userController,
             validator: (value) {
               if (value!.isEmpty) {
                 return 'Please Fill User in Blank';
@@ -94,6 +101,7 @@ class _CreateAccountState extends State<CreateAccount> {
           margin: EdgeInsets.only(top: 16),
           width: size * 0.5,
           child: TextFormField(
+            controller: passwordController,
             validator: (value) {
               if (value!.isEmpty) {
                 return 'Please Fill Password in Blank';
@@ -184,7 +192,33 @@ class _CreateAccountState extends State<CreateAccount> {
 
   Future<Null> processCreateAccount() async {
     if (formKey.currentState!.validate()) {
-      
+      String name = nameController.text;
+      String user = userController.text;
+      String password = passwordController.text;
+      print('## name = $name, user = $user, password = $password');
+
+      // check user
+      String apiCheckUser =
+          'https://www.androidthai.in.th/bigc/getUserWhereUser.php?isAdd=true&user=$user';
+      await Dio().get(apiCheckUser).then((value) async {
+        print('value = $value');
+        if (value.toString() == 'null') {
+          print('User True');
+          String path =
+              'https://www.androidthai.in.th/bigc/insertUser.php?isAdd=true&name=$name&user=$user&password=$password&lat=$lat&lng=$lng';
+          await Dio().get(path).then((value) {
+            if (value.toString() == 'true') {
+              Navigator.pop(context);
+            } else {
+              MyDialog().normalDialog(context, 'Please Try Again');
+            }
+          });
+        } else {
+          print('User False');
+          MyDialog()
+              .normalDialog(context, 'User ซ้ำ กรุณาเปลี่ยน User ใหม่คะ ');
+        }
+      });
     }
   }
 

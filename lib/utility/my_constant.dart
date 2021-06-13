@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class MyConstant {
   // General
   static String appName = 'Unrg Maketer';
+  static String urlWeb = 'https://www.flutterthailand.com';
 
   // Route
   static String routeAuthen = '/authen';
